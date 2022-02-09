@@ -36,5 +36,7 @@ In this app, you can:
 ## 🧪 Running Test Suite
 
 ## 🐞 Known Bugs
+- Color of repo card does not change as expected when marked as seen or when a new release has been found
+- Async storage does not populate saved repos on web
 
 ## 😱 Common Problems

@@ -1,17 +1,48 @@
 import { useEffect, useState } from 'react';
-import { StyleSheet, View, SafeAreaView, TextInput, Text, ScrollView, FlatList, Image, Alert } from 'react-native';
+import { View, TextInput, ScrollView, FlatList, Alert } from 'react-native';
+import styled from 'styled-components/native'
 import { getNewRepoForStorage, Repo, getUpdatedRepos } from './src/api/githubAPI';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Button from './src/components/button'
 import RepoCard from './src/components/repoCard';
 
+const AppContainter = styled.SafeAreaView`
+  flex: 1;
+  background-color: #F6D4D2;
+  align-items: center;
+  width: 100%
+`
+
+const HeaderText = styled.Text`
+  font-family: Arial;
+  font-size: 30;
+  font-weight: bold;
+`
+
+const AddRepoContainer = styled.View`
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+`
+
+const ButtonContainer = styled.View`
+  width: 30%;
+`
+
+const FlatListContainer = styled.View`
+  width: 95%;
+  margin-vertical: 10px;
+`
+
 export default function App() {
-  //State Management
   const [text, onChangeText] = useState('');
   const [repoList, updateRepoList]= useState<Repo[]>([]);
 
   //Async Storage Management
-  //retrieve any stored repos and add them to state
+
+  ///retrieve any stored repos and add them to state
+  ///KNOWN BUG: aync storage does not work properly on web!
   const retrieveStoredRepos = async () => {
     try {
       const repos = await AsyncStorage.getItem('repos');
@@ -21,7 +52,7 @@ export default function App() {
     }
   };
 
-  //update the list of stored repos when a repo is added
+  ///update the list of stored repos when a repo is added
   const updateStoredRepos = async (repos: Repo[]) => {
     try {
       await AsyncStorage.setItem(
@@ -34,16 +65,14 @@ export default function App() {
   };
 
   //Lifecycle Hooks
-  //retrieve stored repos upon first app render
+  ///retrieve stored repos upon first app render and check for new releases
   useEffect(() => {
-    retrieveStoredRepos()
+    retrieveStoredRepos();
+    handleNewReleases();
   },[])
 
-  //check for new releases
-  useEffect(() => {
-    handleNewReleases()
-  }, [])
 
+  //UI handlers
   const handleNewReleases = async() => {
     let newRepoList = repoList
     const newReleases = await getUpdatedRepos(repoList);
@@ -55,8 +84,6 @@ export default function App() {
     updateStoredRepos(newRepoList)
   }
 
-
-  //Interaction Methods
   const handleAddRepoPress = async (text: string) => {
     const newRepo = await getNewRepoForStorage(text)
     if (repoList.find(repo => repo.name === newRepo.name)) {
@@ -70,8 +97,8 @@ export default function App() {
 
   const handleRemoveRepoPress = async (repoName: string) => {
     let newRepoList = repoList
-    const indexOfRepo = newRepoList.findIndex(repo => repo.name === repoName)
-    newRepoList.splice(indexOfRepo, 1)
+    const repoIndex = newRepoList.findIndex(repo => repo.name === repoName)
+    newRepoList.splice(repoIndex, 1)
     updateRepoList(newRepoList)
     updateStoredRepos(newRepoList)
   }
@@ -89,7 +116,7 @@ export default function App() {
     updateStoredRepos(newRepoList)
   }
 
-  const renderSingleRepo = (item: Repo) => (
+  const renderSingleRepo = ({item} : {item: Repo}) => (
     <ScrollView>
       <RepoCard 
         name={item.name}
@@ -109,48 +136,24 @@ export default function App() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.input}>
-        <Image source={require('./assets/drWatchDoggie.png')} style={{width: '30%', height:'100%'}} />
-        <Text style={styles.header}>Dr. WatchDoggie's Library Monitor</Text>
+    <AppContainter>
+      <View>
+        <HeaderText>Dr. WatchDoggie's Library Monitor</HeaderText>
       </View>
     
-      <View style={styles.input}>
+      <AddRepoContainer>
         <TextInput placeholder='Add the link to a GitHub repo' onChangeText={onChangeText}/>
-        <View style={styles.buttonContainer}>
-          <Button title='Add Repo' onPress={() => handleAddRepoPress(text)} backgroundColor='green' textColor='white'/>
-        </View>
-      </View>
-      <ScrollView>
-        {repoList.map((repo: Repo, key: number) => {
-          return renderSingleRepo(repo)
-        })}
-      </ScrollView>
-        {/* <FlatList 
+        <ButtonContainer>
+          <Button title='Add Repo' onPress={() => handleAddRepoPress(text)} backgroundColor='#CCCCFF' fill={true}/>
+        </ButtonContainer>
+      </AddRepoContainer>
+      <FlatListContainer>
+        <FlatList 
           data={repoList}
           renderItem={renderSingleRepo}
           extraData={repoList}
-        /> */}
-    </SafeAreaView>
+        />
+      </FlatListContainer>
+    </AppContainter>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F6D4D2',
-    alignItems: 'center',
-  },
-  input: {
-    flexDirection: 'row',
-  },
-  buttonContainer: {
-    width: '30%',
-    margin: '5%',
-  },
-  header: {
-    fontFamily: 'Arial',
-    fontSize: 30,
-    fontWeight: 'bold',
-  }
-});

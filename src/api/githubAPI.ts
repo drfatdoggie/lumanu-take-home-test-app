@@ -1,5 +1,3 @@
-//turn into an .env value
-
 const API_BASE_URL = 'https://api.github.com'
 
 
@@ -40,6 +38,7 @@ const getGitHubLatestRelease = async (apiURL: string) => {
   }
 }
 
+//Action Helpers
 export const getUpdatedRepos = async (repoList: Repo[])  => {
   let updatedRepos: Repo[] = [];
 
@@ -59,13 +58,9 @@ export const getUpdatedRepos = async (repoList: Repo[])  => {
 
   return updatedRepos;
 }
-//helper function that takes repo list and checks for updates on each, if there is an update, add it to a return array that we will then use to update  the full repo list
 
-//Action Helpers
 export const getNewRepoForStorage = async(repoURL: string): Promise<Repo> => {
-  //https://github.com/facebook/react-native
   const splitRepoURL = repoURL.split('/');
-  //clean up using javascript protoype methods
   const repoName = splitRepoURL[splitRepoURL.length - 1];
   const repoOwner = splitRepoURL[splitRepoURL.length - 2];
   const repoInfo = await getGitHubRepo(`${API_BASE_URL}/repos/${repoOwner}/${repoName}`)
