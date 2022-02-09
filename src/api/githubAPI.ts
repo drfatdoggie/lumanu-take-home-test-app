@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://api.github.com'
+const API_BASE_URL = 'https://api.github.com';
 
 
 //Types
@@ -19,22 +19,22 @@ export interface Repo {
 const getGitHubRepo = async(apiURL: string) => {
   try {
     const response = await fetch(apiURL);
-    const json = await response.json()
-    return json
+    const json = await response.json();
+    return json;
   }
   catch (error) {
-    console.error(`Something went wrong retrieving GitHub repo ${apiURL}:`, error)
+    console.error(`Something went wrong retrieving GitHub repo ${apiURL}:`, error);
   }
 }
 
 const getGitHubLatestRelease = async (apiURL: string) => {
   try {
     const response = await fetch(apiURL);
-    const json = await response.json()
-    return json
+    const json = await response.json();
+    return json;
   }
   catch (error) {
-    console.error(`Something went wrong retrieving GitHub release information for ${apiURL}:`, error)
+    console.error(`Something went wrong retrieving GitHub release information for ${apiURL}:`, error);
   }
 }
 
@@ -44,7 +44,7 @@ export const getUpdatedRepos = async (repoList: Repo[])  => {
 
   repoList.forEach(async (repo: Repo) => {
     let copyRepo = repo;
-    const fetchedRelease = await getGitHubLatestRelease(`${API_BASE_URL}/repos/${repo.owner}/${repo.name}/releases/latest`)
+    const fetchedRelease = await getGitHubLatestRelease(`${API_BASE_URL}/repos/${repo.owner}/${repo.name}/releases/latest`);
     if (fetchedRelease.published_at !== repo.latestReleaseDate) {
       copyRepo.latestReleaseDate = fetchedRelease.published_at;
       copyRepo.latestReleaseVersion = fetchedRelease.name;
@@ -63,8 +63,8 @@ export const getNewRepoForStorage = async(repoURL: string): Promise<Repo> => {
   const splitRepoURL = repoURL.split('/');
   const repoName = splitRepoURL[splitRepoURL.length - 1];
   const repoOwner = splitRepoURL[splitRepoURL.length - 2];
-  const repoInfo = await getGitHubRepo(`${API_BASE_URL}/repos/${repoOwner}/${repoName}`)
-  const releaseInfo = await getGitHubLatestRelease(`${API_BASE_URL}/repos/${repoOwner}/${repoName}/releases/latest`)
+  const repoInfo = await getGitHubRepo(`${API_BASE_URL}/repos/${repoOwner}/${repoName}`);
+  const releaseInfo = await getGitHubLatestRelease(`${API_BASE_URL}/repos/${repoOwner}/${repoName}/releases/latest`);
   
   return {
     name: repoInfo.name, 
@@ -76,5 +76,5 @@ export const getNewRepoForStorage = async(repoURL: string): Promise<Repo> => {
     newRelease: false,
     ownerAvatar: repoInfo.owner.avatar_url,
     owner: repoOwner
-  }
+  };
 }

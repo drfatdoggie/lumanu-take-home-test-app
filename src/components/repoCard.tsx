@@ -16,7 +16,7 @@ interface StyleProps {
   newRelease: boolean;
 }
 
-type Props = Repo & CardProps;
+type Props = Repo & CardProps
 
 //KNOWN BUG: Color does not change from transparent when there is a new release or the release is marked as seen
 const CardContainer = styled.View<StyleProps>`
@@ -46,9 +46,9 @@ const RepoCard: React.FC<Props> = ({
   handleRemoveRepo,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [toggleEnabled, updateToggleEnabled] = useState(false)
+  const [toggleEnabled, updateToggleEnabled] = useState(false);
 
-  const releaseDate = new Date(latestReleaseDate).toLocaleDateString('en-US')
+  const releaseDate = new Date(latestReleaseDate).toLocaleDateString('en-US');
 
   const handleExpandPress = () => {
     setIsExpanded(isExpanded => !isExpanded)
